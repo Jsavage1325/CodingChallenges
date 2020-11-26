@@ -1,0 +1,87 @@
+Imports System
+Public Structure matrix
+    Public mat(,) As Int32
+End Structure
+Public Class detclass
+    Public Function Determinant(mat(,) As Int32, total As Int32)
+        Dim xSize As Int32 = mat.GetLength(0)
+        Dim ySize As Int32 = mat.GetLength(1)
+        'If length is 2 then do simple calculation for det
+        If xSize = 2 Then
+            Dim value As Integer
+            value = (mat(0, 0) * mat(1, 1)) - (mat(1, 0) * mat(0, 1))
+            Return value
+        End If
+        'loop through the size of the array
+        For fc = 0 To xSize - 1
+            ' create a copy we can change as to not change original
+            Dim height As Int32
+            height = (Math.Sqrt(mat.Length) - 1)
+            ' we basically remove the top row and create matCopy here
+            Dim matCopy(xSize - 1, ySize - 2) As Int32
+            For a = 0 To xSize - 1
+                For b = 1 To xSize - 1
+                    Dim v As Integer = mat(a, b)
+                    matCopy(a, b - 1) = v
+                Next
+            Next
+            ' Create an array of the correct size to store the new matrix with fc column
+            ' (column, row)
+            Dim subDetMat(xSize - 2, ySize - 2) As Int32
+            Dim size As Int32 = subDetMat.GetLength(0)
+            'Loop through the remaining rows and remove focus column elements
+            'Focus column is fc, so we remove all columns with index fc
+            For a = 0 To xSize - 2
+                ' loop all values before fc
+                For b = 0 To fc - 1
+                    subDetMat(b, a) = matCopy(b, a)
+                Next
+                ' loop all values after fc
+                For b = fc + 1 To ySize - 1
+                    subDetMat(b - 1, a) = matCopy(b, a)
+                Next
+            Next
+            ' create sign for calculating the total
+            Dim sign As Int32 = (-1) ^ (fc Mod 2)
+            ' value to pass as new total = 0
+            Dim valueToPass As Int32 = 0
+            ' get subdet using recursion
+            Dim subDet As Int32 = Determinant(subDetMat, valueToPass)
+            total = total + (sign * mat(fc, 0)) * subDet
+        Next
+
+        Return total
+
+    End Function
+    Public Function getLine()
+        'try to get input, if it fails, display message and try again
+        Try
+            Dim x As Int32 = Console.ReadLine()
+            Return x
+        Catch
+            Console.WriteLine("You have entered a non integer character, please try again.")
+            Return getLine()
+        End Try
+    End Function
+End Class
+Module Module1
+    Sub Main()
+        Dim detclass As New detclass
+        Console.WriteLine(1 Mod 2)
+        Dim mat1 As matrix
+        Console.WriteLine("enter an int32 value for the row/column amount")
+        Dim n As Int32 = detclass.getLine()
+        ReDim mat1.mat(n - 1, n - 1)
+        For j = 0 To n - 1
+            For i = 0 To n - 1
+                Console.WriteLine("Enter an int32 value for " & i & " " & j)
+                mat1.mat(i, j) = detclass.getLine()
+            Next
+        Next
+        Dim det As Int32
+        Dim total As Int32 = 0
+        det = detclass.Determinant(mat1.mat, total)
+        Console.WriteLine(det)
+        Console.ReadKey()
+    End Sub
+End Module
